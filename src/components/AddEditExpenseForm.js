@@ -3,17 +3,12 @@ import ReactModal from 'react-modal';
 import "./XExpenseTracker.css";
 
 const AddEditExpenseForm = ({ addExpense, editExpense, currentExpense, showModal, closeModal }) => {
-    const [formData, setFormData] = useState({ title: '', price: '', category: '', date: '' });
+    const [formData, setFormData] = useState({ title: '', amount: '', category: '', date: '' });
 
     const categories = ["Food", "Entertainment", "Travel", "Shopping", "Utilities"];
 
-    // Sync form data when editing
     useEffect(() => {
-        if (currentExpense) {
-            setFormData(currentExpense);
-        } else {
-            setFormData({ title: '', price: '', category: '', date: '' });
-        }
+        setFormData(currentExpense || { title: '', amount: '', category: '', date: '' });
     }, [currentExpense]);
 
     const handleChange = (e) => {
@@ -23,44 +18,49 @@ const AddEditExpenseForm = ({ addExpense, editExpense, currentExpense, showModal
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (currentExpense) {
-            editExpense(formData);
-        } else {
-            addExpense(formData);
+
+        const expenseData = {
+            ...formData,
+            amount: parseFloat(formData.amount)
+        };
+
+        if (isNaN(expenseData.amount) || expenseData.amount <= 0) {
+            alert("Please enter a valid positive amount.");
+            return;
         }
-        setFormData({ title: '', price: '', category: '', date: '' });
+
+        currentExpense ? editExpense(expenseData) : addExpense(expenseData);
+
+        setFormData({ title: '', amount: '', category: '', date: '' });
         closeModal();
     };
 
     return (
-        <ReactModal
-            className="custom-modal"
-            isOpen={showModal}
-            onRequestClose={closeModal}
-            ariaHideApp={false}
-        >
-            <h3>Add Expenses</h3>
+        <ReactModal className="custom-modal" isOpen={showModal} onRequestClose={closeModal} ariaHideApp={false}>
+            <h3>{currentExpense ? "Edit Expense" : "Add Expenses"}</h3>
             <form className="formComponent" onSubmit={handleSubmit}>
                 <label className="sr-only">Title:</label>
                 <input
                     className="input-txt"
                     type="text"
                     name="title"
-                    placeholder="Title"
+                    placeholder="  Title"
                     value={formData.title}
                     onChange={handleChange}
                     required
                 />
-                
-                <label className="sr-only">Price:</label>
+
+                <label className="sr-only">Amount:</label>
                 <input
                     className="input-txt"
                     type="number"
-                    name="price"
-                    placeholder="Amount"
-                    value={formData.price}
+                    name="amount"
+                    placeholder="  Amount"
+                    value={formData.amount}
                     onChange={handleChange}
                     required
+                    min="0.01"
+                    step="0.01"
                 />
 
                 <label className="sr-only">Category:</label>
@@ -72,8 +72,8 @@ const AddEditExpenseForm = ({ addExpense, editExpense, currentExpense, showModal
                     required
                 >
                     <option value="" disabled>Select Category</option>
-                    {categories.map((cat, idx) => (
-                        <option key={idx} value={cat}>{cat}</option>
+                    {categories.map((category, index) => (
+                        <option key={index} value={category}>{category}</option>
                     ))}
                 </select>
 
@@ -88,30 +88,32 @@ const AddEditExpenseForm = ({ addExpense, editExpense, currentExpense, showModal
                 />
 
                 <button
-                    type="submit"
                     style={{
                         backgroundColor: "orange",
                         width: "40%",
                         height: "30px",
                         margin: "5px 20px",
                         borderRadius: "10px",
-                        border: "none"
+                        border: "none",
+                        cursor: "pointer",
                     }}
+                    type="submit"
                 >
                     {currentExpense ? 'Edit Expense' : 'Add Expense'}
                 </button>
 
                 <button
                     type="button"
-                    onClick={closeModal}
                     style={{
                         backgroundColor: "grey",
                         width: "25%",
                         height: "30px",
                         margin: "5px 20px",
                         borderRadius: "10px",
-                        border: "none"
+                        border: "none",
+                        cursor: "pointer",
                     }}
+                    onClick={closeModal}
                 >
                     Cancel
                 </button>
