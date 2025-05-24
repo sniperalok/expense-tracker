@@ -5,7 +5,7 @@ const AddBalanceComponent = ({addBalance,walletBalance,showBalanceModal,closeBal
     const [newIncome,setNewIncome] = useState("");
 
     const handleChange = (e) => {
-        setNewIncome(parseInt(e.target.value));
+        setNewIncome(e.target.value);
     }
 
     const handleSubmit = (e) => {
@@ -21,8 +21,8 @@ const AddBalanceComponent = ({addBalance,walletBalance,showBalanceModal,closeBal
                     <h3 style={{paddingTop: "15px" ,marginLeft: "20px"}}>Add Balance</h3>
                     <form className="formComponent addBalance_form" onSubmit={handleSubmit}>
                         <label className="sr-only">Income:</label>
-                        <input className="input-txt" type="text" name="income" 
-                            placeholder="  Income Amount" value={newIncome} onChange={handleChange} required 
+                        <input className="input-txt" type="number" name="income" 
+                            placeholder="Income Amount" value={newIncome} onChange={handleChange} required 
                         />
 
                         <button style={{
